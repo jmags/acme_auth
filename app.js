@@ -1,29 +1,39 @@
 const express = require('express');
 const app = express();
-const { models: { User }} = require('./db');
+const { models: { User, Task } } = require('./db');
 const path = require('path');
+
 
 // middleware
 app.use(express.json());
 
 // routes
-app.get('/', (req, res)=> res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-app.post('/api/auth', async(req, res, next)=> {
+app.post('/api/auth', async (req, res, next) => {
   try {
-    res.send({ token: await User.authenticate(req.body)});
+    res.send({ token: await User.authenticate(req.body) });
   }
-  catch(ex){
+  catch (ex) {
     next(ex);
   }
 });
 
-app.get('/api/auth', async(req, res, next)=> {
+app.get('/api/auth', async (req, res, next) => {
   try {
     res.send(await User.byToken(req.headers.authorization));
   }
-  catch(ex){
+  catch (ex) {
     next(ex);
+  }
+});
+
+app.get('/api/notes/:userid', async (req, res, next) => {
+  try {
+    tasks = await Task.findall({where: {userId: req.params.userid}});
+    res.send(tasks);
+  } catch (error) {
+    next(error);
   }
 });
 
