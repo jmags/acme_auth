@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { models: { User, Task } } = require('./db');
+const { models: { User } } = require('./db');
 const path = require('path');
 
 
@@ -28,9 +28,10 @@ app.get('/api/auth', async (req, res, next) => {
   }
 });
 
-app.get('/api/notes/:userid', async (req, res, next) => {
+app.get('/api/users/:id/notes', async (req, res, next) => {
   try {
-    tasks = await Task.findall({where: {userId: req.params.userid}});
+    const targetUser = await User.findOne({where: {username: req.params.id}});
+    const tasks = await targetUser.getNotes();
     res.send(tasks);
   } catch (error) {
     next(error);
